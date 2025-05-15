@@ -46,7 +46,7 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define U1_RING_BUFFER_1_BYTE	0
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

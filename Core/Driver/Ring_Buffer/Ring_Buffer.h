@@ -35,7 +35,8 @@ void RingBuffer_Put_Data(ST_RING_BUFFER *apst_RingBuffer, U1 au1_Data);
 U1 u1_RingBuffer_Get_Data(ST_RING_BUFFER *apst_RingBuffer, U1 *apu1_Data);
 U1 u1_RingBufferIsFull(ST_RING_BUFFER *apst_RingBuffer);
 U1 u1_RingBufferIsEmpty(ST_RING_BUFFER *apst_RingBuffer);
-
+U1 *pu1_GetWritePointer(ST_RING_BUFFER *apst_RingBuffer);
+U1 u1_GetReadPointer(ST_RING_BUFFER *apst_RingBuffer, U1 *apu1_Rxbuff);
 #endif	/* RING_BUFFER_H */
 /* ************************************* End of File ******************************************** */
 

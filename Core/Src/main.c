@@ -32,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define U1_RING_BUFFER_LEN	10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,7 +44,9 @@
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+U1 u1_Rx_RingBuff[U1_RING_BUFFER_LEN];
+U1 u1_Buffer_Temp;
+ST_RING_BUFFER st_RingBuffer;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,7 +59,15 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+__weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+#if U1_RING_BUFFER_1_BYTE
+	RingBuffer_Put_Data(&st_RingBuffer, u1_Buffer_Temp);
+	HAL_UART_Receive_IT(&huart1, &u1_Buffer_Temp, 1);
+#else
+	HAL_UART_Receive_IT(&huart1, u1_Rx_RingBuff, 20);
+#endif
+}
 /* USER CODE END 0 */
 
 /**
@@ -91,16 +101,21 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+	RingBuffer_Init(&st_RingBuffer, u1_Rx_RingBuff, sizeof(u1_Rx_RingBuff));
+#if U1_RING_BUFFER_1_BYTE
+	HAL_UART_Receive_IT(&huart1, &u1_Buffer_Temp, 1);
+#else
+	HAL_UART_Receive_IT(&huart1, u1_Rx_RingBuff, 20);
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+	/* USER CODE END WHILE */
+	
+	/* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
@@ -122,13 +137,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+							  |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -136,7 +151,7 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
 }
 
@@ -165,7 +180,7 @@ static void MX_USART1_UART_Init(void)
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
 
@@ -224,7 +239,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+	 ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
